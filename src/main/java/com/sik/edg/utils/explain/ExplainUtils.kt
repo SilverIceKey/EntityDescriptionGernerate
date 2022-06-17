@@ -64,7 +64,7 @@ object ExplainUtils {
         val properties = JSONObject()
         for (declaredField in clazz.declaredFields) {
             val fieldDescription = JSONObject()
-            fieldDescription["type"] = declaredField.type
+            fieldDescription["type"] = declaredField.type.simpleName
             fieldDescription["description"] = declaredField.getAnnotation(Explain::class.java)?.explainValue ?: "未知"
             properties[declaredField.name] = fieldDescription
         }

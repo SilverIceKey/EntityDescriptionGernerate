@@ -6,4 +6,4 @@ package com.sik.edg.utils.explain
 /**
  * 类标题
  */
-annotation class Title(val titleValue:String = "标题")
+annotation class Title(val titleValue: String = "标题")
