@@ -37,10 +37,10 @@ object ExplainUtils {
     /**
      * 获取必要属性
      */
-    fun <T> getRequiredField(clazz: Class<T>):String{
+    fun <T> getRequiredField(clazz: Class<T>): String {
         val requiredFields = arrayListOf<String>()
         for (declaredField in clazz.declaredFields) {
-            if (declaredField.getAnnotation(Required::class.java)!=null){
+            if (declaredField.getAnnotation(Required::class.java) != null) {
                 requiredFields.add(declaredField.name)
             }
         }
@@ -57,17 +57,28 @@ object ExplainUtils {
         }
         return explainValues
     }
+
     /**
      * 获取类里所有介绍说明
      */
     fun <T> getExplainValuesToJson(clazz: Class<T>): JSONObject {
-        val properties = JSONObject()
+        val properties = JSONObject(true)
         for (declaredField in clazz.declaredFields) {
             val fieldDescription = JSONObject()
-            fieldDescription["type"] = declaredField.type.simpleName
-            fieldDescription["description"] = declaredField.getAnnotation(Explain::class.java)?.explainValue ?: "未知"
+            val explain = declaredField.getAnnotation(Explain::class.java) ?: continue
+            fieldDescription["type"] = toLowFirst(declaredField.type.simpleName)
+            fieldDescription["description"] = explain.explainValue
             properties[declaredField.name] = fieldDescription
         }
         return properties
+    }
+
+    /**
+     * 首字母转小写
+     */
+    private fun toLowFirst(str: String): String {
+        val chars = str.toCharArray()
+        chars[0] = chars[0].toLowerCase()
+        return String(chars)
     }
 }
