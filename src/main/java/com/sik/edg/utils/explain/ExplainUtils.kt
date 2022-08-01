@@ -18,6 +18,16 @@ object ExplainUtils {
         return "未知"
     }
 
+    fun <T> getClassEntity(clazz: Class<T>): JSONObject {
+        val descriptionJson = JSONObject()
+        descriptionJson["title"] = getClassTitle(clazz)
+        descriptionJson["description"] = getClassDescription(clazz)
+        descriptionJson["type"] = "object"
+        descriptionJson["properties"] = getExplainValuesToJson(clazz)
+        descriptionJson["required"] = getRequiredField(clazz)
+        return descriptionJson
+    }
+
     /**
      * 获取class的介绍说明
      */
@@ -64,11 +74,15 @@ object ExplainUtils {
     fun <T> getExplainValuesToJson(clazz: Class<T>): JSONObject {
         val properties = JSONObject(true)
         for (declaredField in clazz.declaredFields) {
-            val fieldDescription = JSONObject()
+            val fieldDescription = JSONObject(true)
             val explain = declaredField.getAnnotation(Explain::class.java) ?: continue
             fieldDescription["type"] = toLowFirst(declaredField.type.simpleName)
             fieldDescription["description"] = explain.explainValue
-            properties[declaredField.name] = fieldDescription
+            if (!isBaseType(fieldDescription["type"].toString())){
+                properties[declaredField.name] = getClassEntity(declaredField.type)
+            }else{
+                properties[declaredField.name] = fieldDescription
+            }
         }
         return properties
     }
@@ -80,5 +94,26 @@ object ExplainUtils {
         val chars = str.toCharArray()
         chars[0] = chars[0].toLowerCase()
         return String(chars)
+    }
+
+    /**
+     * 是否是基础类型
+     */
+    private fun isBaseType(type: String): Boolean {
+        var isBaseType = true
+        val lowCaseType = type.toLowerCase()
+        if (lowCaseType != "string" &&
+            lowCaseType != "integer" &&
+            lowCaseType != "float" &&
+            lowCaseType != "double" &&
+            lowCaseType != "long" &&
+            lowCaseType != "short" &&
+            lowCaseType != "boolean" &&
+            lowCaseType != "localdatetime" &&
+            lowCaseType != "byte"
+        ) {
+            isBaseType = false
+        }
+        return isBaseType
     }
 }

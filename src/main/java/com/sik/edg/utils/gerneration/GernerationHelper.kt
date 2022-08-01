@@ -32,13 +32,7 @@ object GernerationHelper {
             File(JsonFile).mkdirs()
         }
         val os = File(JsonFile + clazz.simpleName + ".txt").outputStream()
-        val descriptionJson = JSONObject()
-        descriptionJson["title"] = ExplainUtils.getClassTitle(clazz)
-        descriptionJson["description"] = ExplainUtils.getClassDescription(clazz)
-        descriptionJson["type"] = "object"
-        descriptionJson["properties"] = ExplainUtils.getExplainValuesToJson(clazz)
-        descriptionJson["required"] = ExplainUtils.getRequiredField(clazz)
-        os.write(descriptionJson.toJSONString().toByteArray())
+        os.write(ExplainUtils.getClassEntity(clazz).toJSONString().toByteArray())
         os.flush()
         os.close()
     }
